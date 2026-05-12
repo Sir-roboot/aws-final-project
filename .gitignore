@@ -1,0 +1,27 @@
+# Terraform local state and cache
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Secrets and local environment
+.env
+.env.*
+*.pem
+*.key
+credentials
+config
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+

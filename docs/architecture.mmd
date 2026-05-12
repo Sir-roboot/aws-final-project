@@ -1,0 +1,49 @@
+architecture-beta
+    group aws(cloud)[AWS Cloud - us-east-1]
+    group vpc(cloud)[VPC 10.0.0.0/16] in aws
+
+    group public(cloud)[Public Subnets] in vpc
+    group app(cloud)[Private Application Subnets] in vpc
+    group data(cloud)[Private Database Subnets] in vpc
+    group managed(cloud)[AWS Managed Services] in aws
+
+    service users(internet)[Web Users]
+    service admin(internet)[Administrator]
+
+    service igw(internet)[Internet Gateway] in public
+    service alb(server)[Application Load Balancer] in public
+    service nat(internet)[NAT Gateway] in public
+
+    service asg(server)[Auto Scaling Group min 2 max 4] in app
+    service ec2a(server)[EC2 App AZ1 Apache PHP] in app
+    service ec2b(server)[EC2 App AZ2 Apache PHP] in app
+
+    service rds(database)[Amazon RDS MySQL countries] in data
+    service dbsubnet(database)[DB Subnet Multi AZ ready] in data
+
+    service secrets(disk)[AWS Secrets Manager rds db credentials] in managed
+    service ssm(server)[Systems Manager Session Manager] in managed
+    service lt(server)[Launch Template t2 micro] in managed
+
+    users:R -- L:igw
+    igw:R -- L:alb
+    alb:B -- T:ec2a
+    alb:B -- T:ec2b
+
+    lt:B -- T:asg
+    asg:B -- T:ec2a
+    asg:B -- T:ec2b
+
+    ec2a:B -- T:rds
+    ec2b:B -- T:rds
+
+    ec2a:R -- L:secrets
+    ec2b:R -- L:secrets
+
+    ec2a:R -- L:nat
+    ec2b:R -- L:nat
+    nat:T -- B:igw
+
+    admin:R -- L:ssm
+    ssm:R -- L:ec2a
+    ssm:R -- L:ec2b
