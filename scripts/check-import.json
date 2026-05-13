@@ -1,0 +1,12 @@
+{
+  "commands": [
+    "#!/bin/bash",
+    "SECRET_ARN=$(aws secretsmanager list-secrets --region us-east-1 --filters Key=name,Values=rds! --query 'SecretList[0].ARN' --output text)",
+    "SECRET=$(aws secretsmanager get-secret-value --region us-east-1 --secret-id $SECRET_ARN --query SecretString --output text)",
+    "DB_USER=$(echo $SECRET | python3 -c \"import json,sys; print(json.load(sys.stdin)['username'])\")",
+    "DB_PWD=$(echo $SECRET | python3 -c \"import json,sys; print(json.load(sys.stdin)['password'])\")",
+    "RDS_HOST=$(aws rds describe-db-instances --region us-east-1 --query 'DBInstances[0].Endpoint.Address' --output text)",
+    "echo RDS_HOST=$RDS_HOST",
+    "mysql -h $RDS_HOST -u $DB_USER -p$DB_PWD countries -N -e 'SELECT COUNT(*) FROM countrydata_final;'"
+  ]
+}

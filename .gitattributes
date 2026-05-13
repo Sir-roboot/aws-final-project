@@ -1,0 +1,6 @@
+*.sh text eol=lf
+*.sh.tpl text eol=lf
+*.tf text eol=lf
+*.md text eol=lf
+*.mmd text eol=lf
+*.json text eol=lf
